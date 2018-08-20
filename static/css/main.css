@@ -1,0 +1,36 @@
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;vertical-align:baseline}
+/* line 22,../../../../../../../../Library/Ruby/Gems/2.0.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+html{line-height:1}
+ol,ul{list-style:none}
+table{border-collapse:collapse;border-spacing:0}
+caption,th,td{text-align:left;font-weight:normal;vertical-align:middle}
+q,blockquote{quotes:none}
+q:before,q:after,blockquote:before,blockquote:after{content:"";content:none}
+a img{border:none}
+article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}
+
+html, body
+{
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  font: 14px/1.5 "PingFang SC";
+  font-family: "helvetica neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft Yahei", "微软雅黑", Arial, sans-serif;
+  background: #F8F8F8;
+  color: #282828;
+}
+
+.clearfix:after, .panel:after, .right-content-panel:after, .main-content .inner-right-content .right-content-platform-announcement:after, .main-content .inner-right-content .right-content-media-report:after, .main-content .inner-right-content .right-content-realtime-case:after, .panel > .title:after, .right-content-panel > .title:after, .main-content .inner-right-content .right-content-platform-announcement > .title:after, .main-content .inner-right-content .right-content-media-report > .title:after, .main-content .inner-right-content .right-content-realtime-case > .title:after, .panel > .content:after, .right-content-panel > .content:after, .main-content .inner-right-content .right-content-platform-announcement > .content:after, .main-content .inner-right-content .right-content-media-report > .content:after, .main-content .inner-right-content .right-content-realtime-case > .content:after, .main-content:after, .main-content .inner-main-content:after, .main-content .inner-right-content:after, .top-notify:after, .top-link:after, .main-menu:after, .main-banner .main-section:after, .sub-banner:after, .main-banner-invest-category .sub-category:after, .sub-banner-adv:after, .sub-banner-adv > ul > li:after, .main-content-invest-container .content > ul > li:after, .main-content-invest-container .prd-panel .brief:after, .right-content-panel-list .content > ul > li:after, .main-content .inner-right-content .right-content-platform-announcement .content > ul > li:after, .main-content .inner-right-content .right-content-media-report .content > ul > li:after, .right-content-realtime-case .detail:after, .footer-corp:after, .footer-frq:after, .main-footer:after, .main-footer .main-section:after {
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: ".";
+  clear: both;
+  height: 0;
+}
+*:first-child + html .clearfix, *:first-child + html .panel, *:first-child + html .right-content-panel, *:first-child + html .main-content .inner-right-content .right-content-platform-announcement, .main-content .inner-right-content *:first-child + html .right-content-platform-announcement, *:first-child + html .main-content .inner-right-content .right-content-media-report, .main-content .inner-right-content *:first-child + html .right-content-media-report, *:first-child + html .main-content .inner-right-content .right-content-realtime-case, .main-content .inner-right-content *:first-child + html .right-content-realtime-case, *:first-child + html .panel > .title, *:first-child + html .right-content-panel > .title, *:first-child + html .main-content .inner-right-content .right-content-platform-announcement > .title, .main-content .inner-right-content *:first-child + html .right-content-platform-announcement > .title, *:first-child + html .main-content .inner-right-content .right-content-media-report > .title, .main-content .inner-right-content *:first-child + html .right-content-media-report > .title, *:first-child + html .main-content .inner-right-content .right-content-realtime-case > .title, .main-content .inner-right-content *:first-child + html .right-content-realtime-case > .title, *:first-child + html .panel > .content, *:first-child + html .right-content-panel > .content, *:first-child + html .main-content .inner-right-content .right-content-platform-announcement > .content, .main-content .inner-right-content *:first-child + html .right-content-platform-announcement > .content, *:first-child + html .main-content .inner-right-content .right-content-media-report > .content, .main-content .inner-right-content *:first-child + html .right-content-media-report > .content, *:first-child + html .main-content .inner-right-content .right-content-realtime-case > .content, .main-content .inner-right-content *:first-child + html .right-content-realtime-case > .content, *:first-child + html .main-content, *:first-child + html .main-content .inner-main-content, .main-content *:first-child + html .inner-main-content, *:first-child + html .main-content .inner-right-content, .main-content *:first-child + html .inner-right-content, *:first-child + html .top-notify, *:first-child + html .top-link, *:first-child + html .main-menu, *:first-child + html .main-banner .main-section, .main-banner *:first-child + html .main-section, *:first-child + html .sub-banner, *:first-child + html .main-banner-invest-category .sub-category, .main-banner-invest-category *:first-child + html .sub-category, *:first-child + html .sub-banner-adv, *:first-child + html .sub-banner-adv > ul > li, *:first-child + html .main-content-invest-container .content > ul > li, .main-content-invest-container *:first-child + html .content > ul > li, *:first-child + html .main-content-invest-container .prd-panel .brief, .main-content-invest-container .prd-panel *:first-child + html .brief, *:first-child + html .right-content-panel-list .content > ul > li, .right-content-panel-list *:first-child + html .content > ul > li, *:first-child + html .main-content .inner-right-content .right-content-platform-announcement .content > ul > li, .main-content .inner-right-content .right-content-platform-announcement *:first-child + html .content > ul > li, *:first-child + html .main-content .inner-right-content .right-content-media-report .content > ul > li, .main-content .inner-right-content .right-content-media-report *:first-child + html .content > ul > li, *:first-child + html .right-content-realtime-case .detail, .right-content-realtime-case *:first-child + html .detail, *:first-child + html .footer-corp, *:first-child + html .footer-frq, *:first-child + html .main-footer, *:first-child + html .main-footer .main-section, .main-footer *:first-child + html .main-section {
+  zoom: 1;
+}
+
+
