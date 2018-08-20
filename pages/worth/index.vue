@@ -8,7 +8,7 @@
             </div>
             <div class="worth-about">
                 <p class="title">总资产(元)</p>
-                <p class="money">{{investSum}}<i class="money-desensitization"></i></p>
+                <p class="money">{{investSum}}<i class="money-desensitization" :class="{open:isOpen}" @click="isOpen = !isOpen"></i></p>
                 <p class="decript">不含快捷通账户余额</p>
             </div>
         </div>
@@ -26,9 +26,13 @@ export default {
   },
   data () {
     return {
+      isOpen:true,
       name:"*丹",
       investSum:fotmatMoney.formatMoney(200000)
     }
+  },
+  methods: {
+
   }
 }
 </script>
@@ -48,8 +52,8 @@ export default {
                 position: absolute;
                 width:2.5rem;
                 height: 2.2rem;
-                background: url("") no-repeat center;
-                background-size: 50%;
+                background: url("~/assets/img/center_back.png") no-repeat center;
+                background-size: 9px 14px;
                 left: 0;
                 top: 0;
             }
@@ -81,6 +85,12 @@ export default {
                     height: 1rem;
                     right: -1.5rem;
                     top: 0.5rem;
+                    background: url("~/assets/img/close.png") no-repeat center;
+                    background-size: 16px 16px;
+                }
+                .open{
+                    background: url("~/assets/img/open.png") no-repeat center;
+                    background-size: 16px 16px;
                 }
             }
         }
