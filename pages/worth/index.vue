@@ -8,10 +8,26 @@
             </div>
             <div class="worth-about">
                 <p class="title">总资产(元)</p>
-                <p class="money">{{investSum}}<i class="money-desensitization" :class="{open:isOpen}" @click="isOpen = !isOpen"></i></p>
+                <p class="money">{{isOpen?investSum:'日进斗金'}}<i class="money-desensitization" :class="{open:isOpen}" @click="toggleOpen"></i></p>
                 <p class="decript">不含快捷通账户余额</p>
             </div>
         </div>
+        <ul class="my-worth-detail">
+            <li v-for="(item,index) in items" :key="index">
+                <nuxt-link :to="item.href" v-if="item.href">
+                    <div :class="item.class">
+                        <img :src="item.icon" />
+                        <span class="title">{{item.title}}</span>
+                        <span class="total">{{(item.total && !isOpen) ? '****' : item.total}}</span>
+                    </div>
+                </nuxt-link>
+                <div :class="item.class" v-else>
+                    <img :src="item.icon" />
+                    <span class="title">{{item.title}}</span>
+                    <span class="total">{{(item.total && !isOpen) ? '****' : item.total}}</span>
+                </div>
+            </li>
+        </ul>
     </div>
 
 </template>
@@ -21,18 +37,41 @@ import fotmatMoney from '~/helper/formatMoney.js'
 export default {
   head () {
      return {
-        title:'我的资产'
+       title: '我的资产'
      }
   },
   data () {
     return {
-      isOpen:true,
-      name:"*丹",
-      investSum:fotmatMoney.formatMoney(200000)
+      isOpen: true,
+      name: '*丹',
+      investSum: fotmatMoney.formatMoney(200000),
+      items:[
+        {
+          icon: require('~/assets/img/balance.png'),
+          title: '可用余额',
+          total: '0.00元',
+          class: 'li_wrap balance'
+        },
+        {
+          icon: require('~/assets/img/investments.png'),
+          title: '我的出借',
+          total: '124.00元',
+          href: '/worth',
+          class: 'li_wrap investments haslink'
+        },
+        {
+          icon: require('~/assets/img/preferential.png'),
+          title: '我的优惠',
+          href: '/preferential',
+          class: 'li_wrap haslink'
+        }
+      ]
     }
   },
   methods: {
-
+    toggleOpen: function () {
+      this.isOpen = !this.isOpen
+    }
   }
 }
 </script>
@@ -43,6 +82,7 @@ export default {
         height: 9.2rem;
         text-align: center;
         color: #ffffff;
+        margin-bottom: 0.5rem;
         .worth-navbar{
             height: 2.2rem;
             line-height: 2.2rem;
@@ -91,6 +131,49 @@ export default {
                 .open{
                     background: url("~/assets/img/open.png") no-repeat center;
                     background-size: 16px 16px;
+                }
+            }
+        }
+    }
+    .my-worth-detail{
+        &>li{
+            background: #FFFFFF;
+            padding-left: 0.8rem;
+            .li_wrap {
+                display: block;
+                height: 2.5rem;
+                line-height: 2.5rem;
+                text-align: left;
+                position: relative;
+                padding-left: 1.7rem;
+                font-size: 0.8rem;
+                &>img{
+                    display: block;
+                    position: absolute;
+                    width: 1rem;
+                    top: 0.72rem;
+                    left: 0;
+                }
+                .title{
+                    color: #282828;
+                }
+                .total{
+                    color: #666666;
+                    display: block;
+                    position: absolute;
+                    right: 1.5rem;
+                    top: 0;
+                    text-align: right;
+                }
+                &.haslink{
+                    background: url("~/assets/img/worth_li_bg.png") no-repeat 97% center;
+                    background-size: 14px 14px;
+                }
+                &.balance{
+                    margin-bottom: 0.5rem;
+                }
+                &.investments{
+                    border-bottom: 1px solid #EFEFEF;
                 }
             }
         }
