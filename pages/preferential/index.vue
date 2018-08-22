@@ -1,5 +1,6 @@
 <template>
     <div class="preferential-container">
+        <!--<div>{{$store.state.couponList}}</div>-->
         <div class="top-con">
             <ul class="top-con-ul">
                 <li class="preferential-type-li" :class="{active:type==='yhq'}" @click="toggleType('yhq')">优惠券</li>
@@ -43,8 +44,12 @@
                         </div>
                         <p class="cut-off-rule"><i class="left-circular"></i><i class="right-circular"></i></p>
                         <p class="bottomdetail clearfix">
-                        <span class="releasetime">{{item.releasetime}}</span>
-                        <span class="explain">{{item.explain}}</span>
+                            <span class="releasetime">{{item.releasetime}}</span>
+                            <span class="explain">{{item.explain}}</span>
+                        </p>
+                        <p class="hasused-detail" v-if="item.hasused && couponstate === 'hasused'">
+                            <span class="usedtime">{{item.usedtime}}</span>
+                            <span class="purpose">{{item.purpose}}</span>
                         </p>
                     </div>
                 </li>
@@ -56,6 +61,7 @@
 </template>
 
 <script>
+  import { mapState } from 'vuex'
   export default {
     head () {
       return {
@@ -94,7 +100,10 @@
             limitdetail: '限180天及以上小金链、优易计划、融 融发、海赚',
             overdue: true,
             releasetime: '2018-01-01',
-            explain: '夏日优易专享30元抵扣券'
+            explain: '夏日优易专享30元抵扣券',
+            hasused: true, //已过期
+            usedtime: '2018-08-06',
+            purpose: '购买小金链3244'
           },
           {
             type: 2, // 加息券
@@ -108,6 +117,11 @@
           }
         ]
       }
+    },
+    computed: {
+      ...mapState([
+        'couponList'
+      ])
     },
     methods: {
       toggleType (type) {
@@ -185,8 +199,9 @@
                 height: 2.25rem;
                 border-right: 1px dotted #DDDDDD;
                 color: #FF6633;
-                float: left;
                 box-sizing: border-box;
+                display: inline-block;
+                vertical-align: middle;
                 .money{
                     height: 1.4rem;
                     line-height: 1.4rem;
@@ -218,16 +233,16 @@
             }
             .right{
                 width: 68.2%;
-                float: left;
                 box-sizing: border-box;
                 padding: 0 0.9rem;
+                display: inline-block;
+                vertical-align: middle;
                 .time{
                     font-size: 0.7rem;
                     font-weight: bold;
                     color: #282828;
                     line-height: 0.7rem;
-                    position: relative;
-                    top: -0.4rem;
+                    margin-bottom: 0.4rem;
                 }
                 .limitmoney,.limitdetail{
                     font-size: 0.6rem;
@@ -267,6 +282,20 @@
                     float: left;
                 }
                 .explain{
+                    float: right;
+                }
+            }
+            .hasused-detail{
+                height: 1rem;
+                background: #CCCCCC;
+                padding: 0 0.75rem;
+                color: #ffffff;
+                line-height: 1rem;
+                font-size: 0.5rem;
+                .usedtime{
+                    float: left;
+                }
+                .purpose{
                     float: right;
                 }
             }
