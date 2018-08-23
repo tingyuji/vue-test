@@ -1,21 +1,27 @@
 import Vuex from 'vuex'
+import actions from './actions'
+import mutations from './mutations'
 
 const store = () => new Vuex.Store({
   state: {
-    couponList: []
+    couponListList: []
   },
-  mutations: {
-    getcouponList (state) {
-      state.couponList = [
-        {
-          name: '小金链',
-          time: '2018-09-09'
-        }
 
-      ]
-    }
+  actions,
+  mutations
 
-  }
+  // mutations: {
+  //   getcouponList (state) {
+  //     state.couponListList = [
+  //       {
+  //         name: '小金链',
+  //         time: '2018-09-09'
+  //       }
+  //
+  //     ]
+  //   }
+  //
+  // }
 })
 
 export default store

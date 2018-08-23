@@ -8,7 +8,7 @@
             </div>
             <div class="worth-about">
                 <p class="title">总资产(元)</p>
-                <p class="money">{{isOpen?investSum:'日进斗金'}}<i class="money-desensitization" :class="{open:isOpen}" @click="toggleOpen"></i></p>
+                <p class="money">{{isOpen ? totalAsset : '日进斗金'}}<i class="money-desensitization" :class="{open:isOpen}" @click="toggleOpen"></i></p>
                 <p class="decript">不含快捷通账户余额</p>
             </div>
         </div>
@@ -33,6 +33,7 @@
 </template>
 
 <script>
+  import { mapState } from 'vuex'
 import fotmatMoney from '~/helper/formatMoney.js'
 export default {
   head () {
@@ -44,7 +45,7 @@ export default {
     return {
       isOpen: true,
       name: '*丹',
-      investSum: fotmatMoney.formatMoney(200000),
+      totalAsset: '',
       items:[
         {
           icon: require('~/assets/img/balance.png'),
@@ -68,7 +69,23 @@ export default {
       ]
     }
   },
+
+  computed: {
+    ...mapState([
+      'userInfo'
+    ])
+  },
+
+  beforeCreate () {
+    this.$store.dispatch('getUserInvestInfo').then( res => {
+      console.log(res)
+      this.totalAsset = (res && res.totalAsset) ? fotmatMoney.formatMoney(res.totalAsset) : '0.00';
+      this.items[0].total = (res && res.availBalance ) ? fotmatMoney.formatMoney(res.availBalance ) + '元' : '0.00' + '元';
+      this.items[1].total = (res && res.investingAmount  ) ? fotmatMoney.formatMoney(res.investingAmount  ) + '元' : '0.00' + '元';
+    })
+  },
   methods: {
+
     toggleOpen: function () {
       this.isOpen = !this.isOpen
     }

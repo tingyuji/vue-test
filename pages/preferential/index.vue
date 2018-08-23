@@ -1,6 +1,5 @@
 <template>
     <div class="preferential-container">
-        <!--<div>{{$store.state.couponList}}</div>-->
         <div class="top-con">
             <ul class="top-con-ul">
                 <li class="preferential-type-li" :class="{active:type==='yhq'}" @click="toggleType('yhq')">优惠券</li>
@@ -18,38 +17,38 @@
             </ul>
         </div>
         <div class="coupon-wrap">
-            <ul>
+            <ul v-if="couponList.length">
                 <li v-for="(item,index) in couponList" :key="index">
                     <div class="coupon-detail" :class="couponstate">
                         <div class="overdue" v-if="item.overdue"></div>
                         <div class="clearfix">
                             <div class="left">
-                                <p class="money" v-if="item.type === 1">
+                                <p class="money" v-if="item.couponKind === 1">
                                     <i>￥</i>
-                                    <span class="integermoney">{{item.formatmoney.integermoney}}</span>
-                                    <span class="decimalmoney">{{item.formatmoney.decimalmoney}}</span>
+                                    <span class="integermoney">{{item.formatCouponValue.integermoney}}</span>
+                                    <span class="decimalmoney">{{item.formatCouponValue.decimalmoney}}</span>
                                 </p>
-                                <p class="money rate" v-if="item.type === 2">
+                                <p class="money rate" v-if="item.couponKind === 2">
                                     <i>+</i>
-                                    <span class="integermoney">{{item.interestrate}}</span>
+                                    <span class="integermoney">{{item.subsidyRate }}</span>
                                     <span class="decimalmoney">%</span>
                                 </p>
-                                <p class="coupontype">{{item.coupontype}}</p>
+                                <p class="coupontype">{{item.couponKind === 1 ? '抵扣券' : '加息券'}}</p>
                             </div>
                             <div class="right">
-                                <p class="time">有效期至{{item.time}}</p>
-                                <p class="limitmoney" v-if="item.limitmoney">满{{item.limitmoney}}元可用</p>
-                                <p class="limitdetail">{{item.limitdetail}}</p>
+                                <p class="time">有效期至{{item.expiredDate}}</p>
+                                <p class="limitmoney" v-if="Number(item.minPayment)">满{{item.minPayment}}元可用</p>
+                                <p class="limitdetail" v-if="item.limittime || item.limittypes">{{item.limittime + item.limittypes}}</p>
                             </div>
                         </div>
                         <p class="cut-off-rule"><i class="left-circular"></i><i class="right-circular"></i></p>
                         <p class="bottomdetail clearfix">
-                            <span class="releasetime">{{item.releasetime}}</span>
-                            <span class="explain">{{item.explain}}</span>
+                            <span class="releasetime">{{item.activateDate + '发放'}}</span>
+                            <span class="explain">{{item.couponName}}</span>
                         </p>
-                        <p class="hasused-detail" v-if="item.hasused && couponstate === 'hasused'">
-                            <span class="usedtime">{{item.usedtime}}</span>
-                            <span class="purpose">{{item.purpose}}</span>
+                        <p class="hasused-detail" v-if="couponstate === 'hasused'">
+                            <span class="usedtime">{{'使用时间' + item.usageTime}}</span>
+                            <span class="purpose">{{item.usageComments}}</span>
                         </p>
                     </div>
                 </li>
@@ -62,6 +61,8 @@
 
 <script>
   import { mapState } from 'vuex'
+  import fotmatMoney from '~/helper/formatMoney.js'
+  import conv from '~/helper/conv'
   export default {
     head () {
       return {
@@ -72,6 +73,7 @@
       return {
         type: 'yhq',
         couponstate: 'canuse',
+        totalCount: 0,
         tabItems: [
           {
             name: '可使用(3)',
@@ -87,46 +89,100 @@
           }
         ],
         couponList:[
-          {
-            type: 1,
-            coupontype: '抵扣券',
-            money: '30.00',
-            formatmoney: {
-              integermoney: '30',
-              decimalmoney: '.00'
-            },
-            time: '2018-08-29',
-            limitmoney: '6',
-            limitdetail: '限180天及以上小金链、优易计划、融 融发、海赚',
-            overdue: true,
-            releasetime: '2018-01-01',
-            explain: '夏日优易专享30元抵扣券',
-            hasused: true, //已过期
-            usedtime: '2018-08-06',
-            purpose: '购买小金链3244'
-          },
-          {
-            type: 2, // 加息券
-            coupontype: '加息券',
-            interestrate: '1.58',
-            time: '2018-08-29',
-            limitdetail: '限180天及以上小金链、优易计划、融 融发、海赚',
-            overdue: false,
-            releasetime: '2018-01-01',
-            explain: '夏日优易专享30元抵扣券'
-          }
+          // {
+          //   type: 1,
+          //   coupontype: '抵扣券',
+          //   money: '30.00',
+          //   formatmoney: {
+          //     integermoney: '30',
+          //     decimalmoney: '.00'
+          //   },
+          //   time: '2018-08-29',
+          //   limitmoney: '6',
+          //   limitdetail: '限180天及以上小金链、优易计划、融 融发、海赚',
+          //   overdue: true,
+          //   releasetime: '2018-01-01',
+          //   explain: '夏日优易专享30元抵扣券',
+          //   hasused: true, //已过期
+          //   usedtime: '2018-08-06',
+          //   purpose: '购买小金链3244'
+          // },
+          // {
+          //   type: 2, // 加息券
+          //   coupontype: '加息券',
+          //   interestrate: '1.58',
+          //   time: '2018-08-29',
+          //   limitdetail: '限180天及以上小金链、优易计划、融 融发、海赚',
+          //   overdue: false,
+          //   releasetime: '2018-01-01',
+          //   explain: '夏日优易专享30元抵扣券'
+          // }
         ]
       }
     },
     computed: {
-      ...mapState([
-        'couponList'
-      ])
+      ...mapState([])
     },
     methods: {
       toggleType (type) {
         this.type = type
+        if (type === 'yhq') {
+          this.getCouponAmount()
+        } else {
+          this.getUserLcjDetail()
+        }
+      },
+      getCouponAmount () {
+        this.$store.dispatch('getCouponAmount').then((res) => {
+          console.log(res)
+          if (res.responseCode === 0) {
+            this.tabItems[0].name = '可使用(' + res.availableAmount + ')'
+            this.tabItems[1].name = '已过期(' + res.expiredAmount  + ')'
+            this.tabItems[2].name = '已使用(' + res.usedAmount  + ')'
+          }
+        })
+      },
+      getUserLcjDetail () {
+        this.$store.dispatch('getUserLcjDetail').then((res) => {
+          console.log(res)
+          if (res.responseCode === 0) {
+            this.tabItems[0].name = '可使用(' + res.unusedLcjCount  + ')'
+            this.tabItems[1].name = '已过期(' + res.expiredLcjCount   + ')'
+            this.tabItems[2].name = '已使用(' + res.usedLcjCount   + ')'
+          }
+        })
       }
+    },
+    beforeCreate () {
+      this.$store.dispatch('getCouponAmount').then((res) => {
+        console.log(res)
+        if (res.responseCode === 0) {
+          this.tabItems[0].name = '可使用(' + res.availableAmount + ')'
+          this.tabItems[1].name = '已过期(' + res.expiredAmount  + ')'
+          this.tabItems[2].name = '已使用(' + res.usedAmount  + ')'
+        }
+      })
+
+      this.$store.dispatch('queryCouponList').then((res) => {
+        console.log(res.pagination.resultList)
+        if (res.responseCode === 0 && res.pagination) {
+          this.totalCount = res.pagination.totalCount
+          if (res.pagination.resultList && res.pagination.resultList.length > 0) {
+            res.pagination.resultList.forEach(item => {
+              item.formatCouponValue = {
+                integermoney: parseInt(item.couponValue / 100),
+                decimalmoney: '.' + ((item.couponValue % 100) < 10 ? '0' : '') + (item.couponValue % 100)
+              }
+              item.minPayment = fotmatMoney.formatCount(parseInt(item.minPayment / 100))
+              item.limittime = Number(item.minProductMaturity) ? '限' + item.minProductMaturity + '天及以上' : ''
+              item.limittypes = item.productTypes ? item.productTypes : ''
+              item.usageTime = (item.usageTime) ? conv.toDateStr(item.usageTime, 'yyyy-MM-dd') : ''
+            })
+          }
+          this.couponList = res.pagination.resultList
+
+        }
+      })
     }
   }
 </script>
