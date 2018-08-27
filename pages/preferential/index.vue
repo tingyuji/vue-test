@@ -1,68 +1,73 @@
 <template>
-    <div class="preferential-container">
+    <div class="preferential-container" :class="{lcjcont: type==='dyj'}" v-scroll="onLoad">
         <div class="top-con">
             <ul class="top-con-ul">
                 <li class="preferential-type-li" :class="{active:type==='yhq'}" @click="toggleType('yhq')">优惠券</li>
                 <li class="preferential-type-li" :class="{active:type==='dyj'}" @click="toggleType('dyj')">抵用金</li>
             </ul>
-            <ul class="coupon-tab-ul clearfix">
+            <div class="mylcj-wrap" v-if="type==='dyj'">
+                <p class="mylcj-title">我的抵用金(元)</p>
+                <p class="mylcj-tatal">{{unusedLcjValue}}</p>
+            </div>
+            <ul class="coupon-tab-ul clearfix" v-if="type==='yhq'">
                 <li
-                   v-for="(item,index) in tabItems"
+                   v-for="(item,index) in yhqtabItems"
                    :key="index" class="tab-li"
                    :class="{active: couponstate===item.tabname}"
-                   @click="couponstate = item.tabname">
+                   @click="tabChange(item.tabname)">
                     {{item.name}}
                     <i></i>
                 </li>
             </ul>
-        </div>
-        <div class="coupon-wrap">
-            <ul v-if="couponList.length">
-                <li v-for="(item,index) in couponList" :key="index">
-                    <div class="coupon-detail" :class="couponstate">
-                        <div class="overdue" v-if="item.overdue"></div>
-                        <div class="clearfix">
-                            <div class="left">
-                                <p class="money" v-if="item.couponKind === 1">
-                                    <i>￥</i>
-                                    <span class="integermoney">{{item.formatCouponValue.integermoney}}</span>
-                                    <span class="decimalmoney">{{item.formatCouponValue.decimalmoney}}</span>
-                                </p>
-                                <p class="money rate" v-if="item.couponKind === 2">
-                                    <i>+</i>
-                                    <span class="integermoney">{{item.subsidyRate }}</span>
-                                    <span class="decimalmoney">%</span>
-                                </p>
-                                <p class="coupontype">{{item.couponKind === 1 ? '抵扣券' : '加息券'}}</p>
-                            </div>
-                            <div class="right">
-                                <p class="time">有效期至{{item.expiredDate}}</p>
-                                <p class="limitmoney" v-if="Number(item.minPayment)">满{{item.minPayment}}元可用</p>
-                                <p class="limitdetail" v-if="item.limittime || item.limittypes">{{item.limittime + item.limittypes}}</p>
-                            </div>
-                        </div>
-                        <p class="cut-off-rule"><i class="left-circular"></i><i class="right-circular"></i></p>
-                        <p class="bottomdetail clearfix">
-                            <span class="releasetime">{{item.activateDate + '发放'}}</span>
-                            <span class="explain">{{item.couponName}}</span>
-                        </p>
-                        <p class="hasused-detail" v-if="couponstate === 'hasused'">
-                            <span class="usedtime">{{'使用时间' + item.usageTime}}</span>
-                            <span class="purpose">{{item.usageComments}}</span>
-                        </p>
-                    </div>
+            <ul class="coupon-tab-ul clearfix" v-if="type==='dyj'">
+                <li
+                   v-for="(item,index) in dyjtabItems"
+                   :key="index" class="tab-li"
+                   :class="{active: lcjstate===item.tabname}"
+                   @click="lcjtabChange(item.tabname)">
+                   {{item.name}}
+                   <i></i>
                 </li>
             </ul>
         </div>
-
-
+        <div class="coupon-wrap">
+            <Coupon :totalCount="yhqtotalCount" :couponList="couponList" :couponstate="couponstate" v-if="type==='yhq'" />
+            <LcjCom :totalCount="lcjtotalCount" :couponList="lcjList" :couponstate="lcjstate" v-else />
+        </div>
+        <div v-if="isLoading">加载中...</div>
     </div>
 </template>
 
 <script>
-  import { mapState } from 'vuex'
   import fotmatMoney from '~/helper/formatMoney.js'
   import conv from '~/helper/conv'
+  import Coupon from '../../components/Coupon.vue'
+  import LcjCom from '../../components/LcjCom.vue'
+  function couponListOperate (items) {
+    items.forEach(item => {
+      item.formatCouponValue = {
+        integermoney: parseInt(item.couponValue / 100),
+        decimalmoney: '.' + ((item.couponValue % 100) < 10 ? '0' : '') + (item.couponValue % 100)
+      }
+      item.minPayment = fotmatMoney.formatCount(parseInt(item.minPayment / 100))
+      item.limittime = Number(item.minProductMaturity) ? '限' + item.minProductMaturity + '天及以上' : ''
+      item.limittypes = item.productTypes ? item.productTypes : ''
+      item.usageTime = (item.usageTime) ? conv.toDateStr(item.usageTime, 'yyyy-MM-dd') : ''
+    })
+    return items
+  }
+  function lcjListOperate (items) {
+    items.forEach(item => {
+      item.formatCouponValue = {
+        integermoney: parseInt(item.lcjValue / 100),
+        decimalmoney: '.' + ((item.lcjValue % 100) < 10 ? '0' : '') + (item.lcjValue % 100)
+      }
+      item.expiredTime = (item.expiredTime) ? conv.toDateStr(item.expiredTime, 'yyyy-MM-dd') : ''
+      item.givenTime = (item.givenTime) ? conv.toDateStr(item.givenTime, 'yyyy-MM-dd') : ''
+      item.limittypes = item.productTypes ? item.productTypes : ''
+    })
+    return items
+  }
   export default {
     head () {
       return {
@@ -72,317 +77,275 @@
     data () {
       return {
         type: 'yhq',
-        couponstate: 'canuse',
-        totalCount: 0,
-        tabItems: [
+        unusedLcjValue: 0,
+        couponstate: 2,
+        lcjstate: 1,
+        yhqtabItems: [
           {
             name: '可使用(3)',
-            tabname: 'canuse'
+            tabname: 2
           },
           {
             name: '已过期(5)',
-            tabname: 'expired'
+            tabname: 4
           },
           {
             name: '已使用(2)',
-            tabname: 'hasused'
+            tabname: 3
           }
         ],
-        couponList:[
-          // {
-          //   type: 1,
-          //   coupontype: '抵扣券',
-          //   money: '30.00',
-          //   formatmoney: {
-          //     integermoney: '30',
-          //     decimalmoney: '.00'
-          //   },
-          //   time: '2018-08-29',
-          //   limitmoney: '6',
-          //   limitdetail: '限180天及以上小金链、优易计划、融 融发、海赚',
-          //   overdue: true,
-          //   releasetime: '2018-01-01',
-          //   explain: '夏日优易专享30元抵扣券',
-          //   hasused: true, //已过期
-          //   usedtime: '2018-08-06',
-          //   purpose: '购买小金链3244'
-          // },
-          // {
-          //   type: 2, // 加息券
-          //   coupontype: '加息券',
-          //   interestrate: '1.58',
-          //   time: '2018-08-29',
-          //   limitdetail: '限180天及以上小金链、优易计划、融 融发、海赚',
-          //   overdue: false,
-          //   releasetime: '2018-01-01',
-          //   explain: '夏日优易专享30元抵扣券'
-          // }
-        ]
+        dyjtabItems: [
+          {
+            name: '可使用(3)',
+            tabname: 1
+          },
+          {
+            name: '已过期(5)',
+            tabname: 3
+          },
+          {
+            name: '已使用(2)',
+            tabname: 2
+          }
+        ],
+        couponpageIndex: 1,
+        lcjpageIndex: 1,
+        pageSize: 5,
+        isLoading: false,
+        yhqtotalCount: 0,
+        couponList: [],
+        lcjtotalCount: 0,
+        lcjList: []
       }
     },
-    computed: {
-      ...mapState([])
+    components: {
+      Coupon,
+      LcjCom
+    },
+    async asyncData (context) {
+      var [ getCouponAmountRes, getUserLcjDetailRes, queryCouponListRes ] = await Promise.all([
+        context.store.dispatch('getCouponAmount'),
+        context.store.dispatch('getUserLcjDetail'),
+        context.store.dispatch('queryCouponList', {pageIndex: 1, pageSize: 10, state: 2})
+      ])
+      var yhqtabItems = [
+        {
+          name: '可使用(3)',
+          tabname: 2
+        },
+        {
+          name: '已过期(5)',
+          tabname: 4
+        },
+        {
+          name: '已使用(2)',
+          tabname: 3
+        }
+      ]
+      var dyjtabItems = [
+        {
+          name: '可使用(3)',
+          tabname: 1
+        },
+        {
+          name: '已过期(5)',
+          tabname: 3
+        },
+        {
+          name: '已使用(2)',
+          tabname: 2
+        }
+      ]
+      var yhqtotalCount = 0
+      var couponList = []
+      var unusedLcjValue = 0
+      if (getCouponAmountRes.responseCode === 0) {
+        yhqtabItems[0].name = '可使用(' + getCouponAmountRes.availableAmount + ')'
+        yhqtabItems[1].name = '已过期(' + getCouponAmountRes.expiredAmount + ')'
+        yhqtabItems[2].name = '已使用(' + getCouponAmountRes.usedAmount + ')'
+      }
+      if (getUserLcjDetailRes.responseCode === 0) {
+        dyjtabItems[0].name = '可使用(' + getUserLcjDetailRes.unusedLcjCount + ')'
+        dyjtabItems[1].name = '已过期(' + getUserLcjDetailRes.expiredLcjCount + ')'
+        dyjtabItems[2].name = '已使用(' + getUserLcjDetailRes.usedLcjCount + ')'
+        unusedLcjValue = fotmatMoney.formatMoney(getUserLcjDetailRes.unusedLcjValue)
+      }
+      if (queryCouponListRes.responseCode === 0 && queryCouponListRes.pagination) {
+        yhqtotalCount = queryCouponListRes.pagination.totalCount
+        if (queryCouponListRes.pagination.resultList && queryCouponListRes.pagination.resultList.length > 0) {
+          couponList = couponListOperate(queryCouponListRes.pagination.resultList)
+        }
+      }
+
+      return {yhqtabItems: yhqtabItems, dyjtabItems: dyjtabItems, unusedLcjValue: unusedLcjValue, yhqtotalCount: yhqtotalCount, couponList: couponList}
+    },
+    directives: {
+      scroll: {
+        bind (el, binding) {
+          window.addEventListener('scroll', () => {
+            let scrollTop = document.documentElement.scrollTop || document.body.scrollTop
+            if (scrollTop + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+              let onLoad = binding.value
+              onLoad()
+            }
+          }, false)
+        }
+      }
     },
     methods: {
       toggleType (type) {
-        this.type = type
-        if (type === 'yhq') {
-          this.getCouponAmount()
-        } else {
-          this.getUserLcjDetail()
+        if (this.type === type) return false
+        else this.type = type
+      },
+      tabChange (tabname) {
+        if (this.couponstate === tabname) return false
+        else {
+          this.couponpageIndex = 1
+          this.couponstate = tabname
+          this.queryCouponList()
         }
       },
-      getCouponAmount () {
-        this.$store.dispatch('getCouponAmount').then((res) => {
-          console.log(res)
-          if (res.responseCode === 0) {
-            this.tabItems[0].name = '可使用(' + res.availableAmount + ')'
-            this.tabItems[1].name = '已过期(' + res.expiredAmount  + ')'
-            this.tabItems[2].name = '已使用(' + res.usedAmount  + ')'
-          }
-        })
-      },
-      getUserLcjDetail () {
-        this.$store.dispatch('getUserLcjDetail').then((res) => {
-          console.log(res)
-          if (res.responseCode === 0) {
-            this.tabItems[0].name = '可使用(' + res.unusedLcjCount  + ')'
-            this.tabItems[1].name = '已过期(' + res.expiredLcjCount   + ')'
-            this.tabItems[2].name = '已使用(' + res.usedLcjCount   + ')'
-          }
-        })
-      }
-    },
-    beforeCreate () {
-      this.$store.dispatch('getCouponAmount').then((res) => {
-        console.log(res)
-        if (res.responseCode === 0) {
-          this.tabItems[0].name = '可使用(' + res.availableAmount + ')'
-          this.tabItems[1].name = '已过期(' + res.expiredAmount  + ')'
-          this.tabItems[2].name = '已使用(' + res.usedAmount  + ')'
+      lcjtabChange (tabname) {
+        if (this.lcjstate === tabname) return false
+        else {
+          this.lcjstate = tabname
+          this.queryLcjListByStatus()
         }
-      })
-
-      this.$store.dispatch('queryCouponList').then((res) => {
-        console.log(res.pagination.resultList)
-        if (res.responseCode === 0 && res.pagination) {
-          this.totalCount = res.pagination.totalCount
-          if (res.pagination.resultList && res.pagination.resultList.length > 0) {
-            res.pagination.resultList.forEach(item => {
-              item.formatCouponValue = {
-                integermoney: parseInt(item.couponValue / 100),
-                decimalmoney: '.' + ((item.couponValue % 100) < 10 ? '0' : '') + (item.couponValue % 100)
+      },
+      queryCouponList () {
+        var couponDatas = {
+          pageIndex: this.couponpageIndex,
+          pageSize: this.pageSize,
+          state: this.couponstate
+        }
+        this.$store.dispatch('queryCouponList', couponDatas).then((res) => {
+          console.log(res.pagination.resultList)
+          if (res.responseCode === 0 && res.pagination) {
+            this.yhqtotalCount = res.pagination.totalCount
+            if (res.pagination.resultList && res.pagination.resultList.length > 0) {
+              var couponList = couponListOperate(res.pagination.resultList)
+              if (this.isLoading) {
+                for (var i = 0; i < couponList.length; i++) {
+                  this.couponList.push(couponList[i])
+                }
+              } else {
+                this.couponList = couponList
               }
-              item.minPayment = fotmatMoney.formatCount(parseInt(item.minPayment / 100))
-              item.limittime = Number(item.minProductMaturity) ? '限' + item.minProductMaturity + '天及以上' : ''
-              item.limittypes = item.productTypes ? item.productTypes : ''
-              item.usageTime = (item.usageTime) ? conv.toDateStr(item.usageTime, 'yyyy-MM-dd') : ''
-            })
+            } else {
+              this.couponList = this.isLoading ? this.couponList : []
+            }
+          } else {
+            this.couponList = this.isLoading ? this.couponList : []
           }
-          this.couponList = res.pagination.resultList
-
+          this.isLoading = false
+        })
+      },
+      queryLcjListByStatus () {
+        var lcjDatas = {
+          pageIndex: 1,
+          pageSize: this.pageSize,
+          state: this.lcjstate
         }
-      })
+        this.$store.dispatch('queryLcjListByStatus', lcjDatas).then((res) => {
+          console.log(res.pagination.resultList)
+          if (res.responseCode === 0 && res.pagination) {
+            this.lcjtotalCount = res.pagination.totalCount
+            if (res.pagination.resultList && res.pagination.resultList.length > 0) {
+              var lcjList = lcjListOperate(res.pagination.resultList)
+              this.lcjList = lcjList
+            } else {
+              this.lcjtotalCount = 0
+              this.lcjList = []
+            }
+          } else {
+            this.lcjtotalCount = 0
+            this.lcjList = []
+          }
+        })
+      },
+      onLoad () {
+        if (!this.isLoading) {
+          if (this.type === 'yhq') {
+            if (this.couponList.length < this.yhqtotalCount) {
+              this.isLoading = true
+              this.couponpageIndex++
+              this.queryCouponList()
+            } else {
+              return false
+            }
+          }
+        } else {
+          return false
+        }
+      }
     }
   }
 </script>
 
-<style scoped lang="scss">
-    .top-con{
-        background: #FFFFFF;
-        height: 5.25rem;
-        .top-con-ul{
-            padding: 0.75rem 0 0.5rem;
-            text-align: center;
-            .preferential-type-li{
-                display: inline-block;
-                vertical-align: middle;
-                box-sizing: border-box;
-                width: 5rem;
-                height: 1.5rem;
-                line-height: 1.5rem;
-                color: #266DFC;
-                font-size: 0.7rem;
-                border: 1px solid #266DFC;
-                &.active{
-                    background: #266DFC;
-                    color: #FFFFFF;
-                }
-            }
-        }
-        .coupon-tab-ul{
-            padding: 0 0.75rem;
-            .tab-li{
-                width: 33.33%;
-                height: 2.25rem;
-                line-height: 2.25rem;
-                text-align: center;
-                position: relative;
-                float: left;
-                font-size: 0.7rem;
-                color: #666666;
-                &>i{
-                    position: absolute;
-                    width: 15px;
-                    height: 2px;
-                    display: block;
-                    bottom: 0;
-                    left: 50%;
-                    margin-left: -7.5px;
-                }
-                &.active{
-                    color: #4C87FC;
-                    &>i{
-                        background: #4C87FC;
-                    }
-                }
-            }
-        }
-    }
-    .coupon-wrap{
-        padding: 0.5rem 0.75rem 0.9rem;
-        .coupon-detail{
-            margin-bottom: 0.5rem;
-            box-shadow: 0px 5px 10px 0px rgba(0,0,0,0.06);
-            background: #ffffff;
-            box-sizing: border-box;
-            padding: 1.15rem 0 0;
-            overflow: hidden;
-            position: relative;
-            .left{
-                width: 31.8%;
-                text-align: center;
-                height: 2.25rem;
-                border-right: 1px dotted #DDDDDD;
-                color: #FF6633;
-                box-sizing: border-box;
-                display: inline-block;
-                vertical-align: middle;
-                .money{
-                    height: 1.4rem;
-                    line-height: 1.4rem;
-                    margin-bottom: 0.2rem;
-                    font-weight: bold;
-                    i{
-                        font-size: 0.7rem;
-                        font-style: normal;
-                        position: relative;
-                        top: -0.35rem;
-                    }
-                    .integermoney{
-                        font-size: 1.4rem;
-                    }
-                    .decimalmoney{
-                        font-size: 0.7rem;
-                    }
-                    &.rate{
-                        color: #FF9500;
-                        i{
-                            top: -0.2rem;
-                        }
-                    }
-                }
-                .coupontype{
-                    font-size: 0.5rem;
-                    color: #666666;
-                }
-            }
-            .right{
-                width: 68.2%;
-                box-sizing: border-box;
-                padding: 0 0.9rem;
-                display: inline-block;
-                vertical-align: middle;
-                .time{
-                    font-size: 0.7rem;
-                    font-weight: bold;
-                    color: #282828;
-                    line-height: 0.7rem;
-                    margin-bottom: 0.4rem;
-                }
-                .limitmoney,.limitdetail{
-                    font-size: 0.6rem;
-                    line-height: 0.8rem;
-                    color: #666666;
-                }
-            }
-            .cut-off-rule{
-                margin: 1rem 0 0.5rem;
-                border-bottom: 1px dotted #DDDDDD;
-                background-size: 50%;
-                position: relative;
-                .left-circular,.right-circular{
-                    width: 0.7rem;
-                    height: 0.7rem;
-                    position: absolute;
-                    -webkit-border-radius: 50%;
-                    -moz-border-radius: 50%;
-                    border-radius: 50%;
-                    top: 50%;
-                    margin-top: -0.35rem;
-                    background: #f1f1f1;
-                }
-                .left-circular{
-                    left: -0.35rem;
-                }
-                .right-circular{
-                    right: -0.35rem;
-                }
-            }
-            .bottomdetail{
-                padding:0 0.8rem 0.5rem;
-                line-height: 0.8rem;
-                color: #999999;
-                font-size: 0.6rem;
-                .releasetime{
-                    float: left;
-                }
-                .explain{
-                    float: right;
-                }
-            }
-            .hasused-detail{
-                height: 1rem;
-                background: #CCCCCC;
-                padding: 0 0.75rem;
-                color: #ffffff;
-                line-height: 1rem;
-                font-size: 0.5rem;
-                .usedtime{
-                    float: left;
-                }
-                .purpose{
-                    float: right;
-                }
-            }
-            .overdue{
-                position: absolute;
-                right: -0.6rem;
-                top: -0.55rem;
-                height: 4rem;
-                width: 4rem;
-                background: url("~/assets/img/overdue.png") no-repeat center;
-                background-size: cover;
-            }
-            &.expired,&.hasused{
-                .left{
-                    color: #666666;
-                    .coupontype{
-                        color: #999999;
-                    }
-                    .money.rate{
-                        color: #666666;
-                    }
-                }
-                .right{
-                    .time{
-                        color: #666666;
-                    }
-                    .limitmoney,.limitdetail{
-                        color: #999999;
-                    }
-                }
-            }
-        }
-    }
+<style scoped lang="sass">
+    .preferential-container
+        .top-con
+            background: #FFFFFF
+            position: fixed
+            z-index: 99
+            top: 0
+            left: 0
+            width: 100%
+            .top-con-ul
+                padding: 0.75rem 0 0.5rem
+                text-align: center
+                .preferential-type-li
+                    display: inline-block
+                    vertical-align: middle
+                    box-sizing: border-box
+                    width: 5rem
+                    height: 1.5rem
+                    line-height: 1.5rem
+                    color: #266DFC
+                    font-size: 0.7rem
+                    border: 1px solid #266DFC
+                    &.active
+                        background: #266DFC
+                        color: #FFFFFF
+            .mylcj-wrap
+                text-align: center
+                .mylcj-title
+                    font-size: 0.6rem
+                    line-height: 0.8rem
+                    padding: 1rem 0 0.25rem
+                    color: #999999
+                .mylcj-tatal
+                    font-size: 1.7rem
+                    color: #282828
+                    margin-bottom: 0.95rem
+                    line-height: 2.3rem
+            .coupon-tab-ul
+                padding: 0 0.75rem 0.25rem
+                .tab-li
+                    width: 33.33%
+                    height: 2.25rem
+                    line-height: 2.25rem
+                    text-align: center
+                    position: relative
+                    float: left
+                    font-size: 0.7rem
+                    color: #666666
+                    &>i
+                        position: absolute
+                        width: 15px
+                        height: 2px
+                        display: block
+                        bottom: 0
+                        left: 50%
+                        margin-left: -7.5px
+                    &.active
+                        color: #4C87FC
+                        &>i
+                            background: #4C87FC
+        .coupon-wrap
+            padding: 5.75rem 0.75rem 0.9rem
+        &.lcjcont
+            .coupon-wrap
+                padding-top: 11rem
+
 </style>

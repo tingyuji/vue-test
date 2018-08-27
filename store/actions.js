@@ -25,8 +25,19 @@ export default {
     })
   },
 
-  queryCouponList () {
-    return Services.queryCouponList().then(function (res) {
+  queryCouponList ({ commit, state, getters }, datas) {
+    datas.hryId = '10007952'
+    return Services.queryCouponList(datas).then(function (res) {
+      console.log(res)
+      return res
+    }).catch(function (err) {
+      console.log(err)
+    })
+  },
+
+  queryLcjListByStatus ({ commit, state, getters }, datas) {
+    datas.hryId = '10007952'
+    return Services.queryLcjListByStatus(datas).then(function (res) {
       return res
     }).catch(function (err) {
       console.log(err)

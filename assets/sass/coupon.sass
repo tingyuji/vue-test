@@ -1,0 +1,132 @@
+.coupon-detail
+  margin-bottom: 0.5rem
+  box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.06)
+  background: #ffffff
+  box-sizing: border-box
+  padding: 1.15rem 0 0
+  overflow: hidden
+  position: relative
+  .left
+    width: 31.8%
+    text-align: center
+    height: 2.25rem
+    border-right: 1px dotted #DDDDDD
+    color: #FF6633
+    box-sizing: border-box
+    display: inline-block
+    vertical-align: middle
+    .money
+      height: 1.4rem
+      line-height: 1.4rem
+      margin-bottom: 0.2rem
+      font-weight: bold
+      i
+        font-size: 0.7rem
+        font-style: normal
+        position: relative
+        top: -0.35rem
+      .integermoney
+        font-size: 1.4rem
+      .decimalmoney
+        font-size: 0.7rem
+      &.rate
+        color: #FF9500
+        i
+          top: -0.2rem
+    .coupontype
+      font-size: 0.5rem
+      color: #666666
+  .right
+    width: 68.2%
+    box-sizing: border-box
+    padding: 0 0.9rem
+    display: inline-block
+    vertical-align: middle
+    .time
+      font-size: 0.7rem
+      font-weight: bold
+      color: #282828
+      line-height: 0.7rem
+      margin-bottom: 0.4rem
+    .limitmoney, .limitdetail
+      font-size: 0.6rem
+      line-height: 0.8rem
+      color: #666666
+  .cut-off-rule
+    margin: 1rem 0 0.5rem
+    border-bottom: 1px dotted #DDDDDD
+    background-size: 50%
+    position: relative
+    .left-circular, .right-circular
+      width: 0.7rem
+      height: 0.7rem
+      position: absolute
+      -webkit-border-radius: 50%
+      -moz-border-radius: 50%
+      border-radius: 50%
+      top: 50%
+      margin-top: -0.35rem
+      background: #f1f1f1
+    .left-circular
+      left: -0.35rem
+    .right-circular
+      right: -0.35rem
+  .bottomdetail
+    padding: 0 0.8rem 0.5rem
+    line-height: 0.8rem
+    color: #999999
+    font-size: 0.6rem
+    .releasetime
+      float: left
+    .explain
+      float: right
+  .hasused-detail
+    height: 1rem
+    background: #CCCCCC
+    padding: 0 0.75rem
+    color: #ffffff
+    line-height: 1rem
+    font-size: 0.5rem
+    .usedtime
+      float: left
+    .purpose
+      float: right
+  .overdue
+    position: absolute
+    right: -0.6rem
+    top: -0.55rem
+    height: 4rem
+    width: 4rem
+    background: url('~/assets/img/overdue.png') no-repeat center
+    background-size: cover
+  &.coupon-state-3, &.coupon-state-4,&.lcj-state-2, &.lcj-state-3
+    .left
+      color: #666666
+      .coupontype
+        color: #999999
+      .money.rate
+        color: #666666
+    .right
+      .time
+        color: #666666
+      .limitmoney, .limitdetail
+        color: #999999
+  &.lcj-detail
+    .left
+      .money
+        height: 2.25rem
+        line-height: 2.25rem
+.hasnothing
+  img
+    display: block
+    width: 24%
+    margin: 4.75rem auto 1rem
+  .hasnothing-tips
+    text-align: center
+    color: #868B90
+    font-size: 0.7rem
+
+    
+  
+  
+

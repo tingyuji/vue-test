@@ -6,7 +6,7 @@ export default {
     // return axios.post(userService + '/userFacade/getUserProperty', {userId:10007952})
     return new Promise(function (resolve, reject) {
       axios.post(userService + '/userFacade/getUserProperty', {userId:10007952}).then(function (res) {
-        res.status === 200 ? resolve(res.data) : reject('错误:', res.status);
+        res.status === 200 ? resolve(res.data) : reject('错误:', res.status)
       }).catch(function (err) {
         reject(err)
       })
@@ -17,7 +17,7 @@ export default {
   getCouponAmount () {
     return new Promise(function (resolve, reject) {
       axios.post(ossService + '/couponFacade/getCouponAmount', {hryId:10007952}).then(function (res) {
-        res.status === 200 ? resolve(res.data) : reject('错误:', res.status);
+        res.status === 200 ? resolve(res.data) : reject('错误:', res.status)
       }).catch(function (err) {
         reject(err)
       })
@@ -25,10 +25,11 @@ export default {
   },
 
   // 优惠券列表
-  queryCouponList () {
+  queryCouponList (datas) {
     return new Promise(function (resolve, reject) {
-      axios.post(ossService + '/couponFacade/queryCouponList', {hryId: 10007952, pageIndex: 1, pageSize: 10, state: 4}).then(function (res) {
-        res.status === 200 ? resolve(res.data) : reject('错误:', res.status);
+      console.log(datas)
+      axios.post(ossService + '/couponFacade/queryCouponList', datas).then(function (res) {
+        res.status === 200 ? resolve(res.data) : reject('错误:', res.status)
       }).catch(function (err) {
         reject(err)
       })
@@ -38,8 +39,19 @@ export default {
   // 抵用金统计
   getUserLcjDetail () {
     return new Promise(function (resolve, reject) {
-      axios.post(ossService + '/rewardsFacade/getUserLcjDetail', {hryId:10007952}).then(function (res) {
-        res.status === 200 ? resolve(res.data) : reject('错误:', res.status);
+      axios.post(ossService + '/rewardsFacade/getUserLcjDetail', {hryId: 10007952}).then(function (res) {
+        res.status === 200 ? resolve(res.data) : reject('错误:', res.status)
+      }).catch(function (err) {
+        reject(err)
+      })
+    })
+  },
+
+  // 抵用金列表
+  queryLcjListByStatus (datas) {
+    return new Promise(function (resolve, reject) {
+      axios.post(ossService + '/rewardsFacade/queryLcjListByStatus', datas).then(function (res) {
+        res.status === 200 ? resolve(res.data) : reject('错误:', res.status)
       }).catch(function (err) {
         reject(err)
       })
