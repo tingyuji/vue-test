@@ -1,16 +1,31 @@
-import axios from 'axios'
+
 import Services from './services'
 export default {
-  getUserInvestInfo () {
-    return Services.getUserInvestInfo().then(function (res) {
+  getUserInvestInfo ({ commit, state }) {
+    var datas = {
+      userId: state.user.userId
+    }
+    console.log(datas)
+    return Services.getUserInvestInfo(datas).then(function (res) {
+      if (res) {
+        var data = {
+          totalAsset: res.totalAsset,
+          availBalance: res.availBalance,
+          investingAmount: res.investingAmount
+        }
+        commit('SET_USERINVEST', data)
+      }
       return res
     }).catch(function (err) {
       console.log(err)
     })
   },
 
-  getCouponAmount () {
-    return Services.getCouponAmount().then(function (res) {
+  getCouponAmount ({state}) {
+    var datas = {
+      hryId: state.user.userId
+    }
+    return Services.getCouponAmount(datas).then(function (res) {
       return res
     }).catch(function (err) {
       console.log(err)
@@ -26,7 +41,7 @@ export default {
   },
 
   queryCouponList ({ commit, state, getters }, datas) {
-    datas.hryId = '10007952'
+    datas.hryId = '10009344'
     return Services.queryCouponList(datas).then(function (res) {
       console.log(res)
       return res
@@ -36,7 +51,7 @@ export default {
   },
 
   queryLcjListByStatus ({ commit, state, getters }, datas) {
-    datas.hryId = '10007952'
+    datas.hryId = '10009344'
     return Services.queryLcjListByStatus(datas).then(function (res) {
       return res
     }).catch(function (err) {

@@ -3,7 +3,7 @@ export default {
     state.user = user
   },
 
-  SET_AUTHUSER: (state, authUser) => {
-    state.authUser = authUser
+  SET_USERINVEST: (state, userInvet) => {
+    state.userInvet = userInvet
   }
 }

@@ -2,7 +2,7 @@
     <ul v-if="couponList.length">
         <li v-for="(item,index) in couponList" :key="index">
             <div class="coupon-detail" :class="'coupon-state-' + couponstate">
-                <div class="overdue" v-if="item.overdue"></div>
+                <div class="overdue" v-if="item.overduetime <= 7 && couponstate === 2"></div>
                 <div class="clearfix">
                     <div class="left">
                         <p class="money" v-if="item.couponKind === 1">

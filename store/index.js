@@ -4,7 +4,11 @@ import mutations from './mutations'
 
 const store = () => new Vuex.Store({
   state: {
-    couponListList: []
+    user: {
+      userId: '10009344'
+    },
+    loginName: '静静',
+    userInvet: null
   },
 
   actions,

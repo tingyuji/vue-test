@@ -40,10 +40,12 @@
 
 <script>
   import fotmatMoney from '~/helper/formatMoney.js'
+  import moment from 'moment'
   import conv from '~/helper/conv'
   import Coupon from '../../components/Coupon.vue'
   import LcjCom from '../../components/LcjCom.vue'
   function couponListOperate (items) {
+    var a = moment().format('YYYY-MM-DD')
     items.forEach(item => {
       item.formatCouponValue = {
         integermoney: parseInt(item.couponValue / 100),
@@ -53,6 +55,8 @@
       item.limittime = Number(item.minProductMaturity) ? '限' + item.minProductMaturity + '天及以上' : ''
       item.limittypes = item.productTypes ? item.productTypes : ''
       item.usageTime = (item.usageTime) ? conv.toDateStr(item.usageTime, 'yyyy-MM-dd') : ''
+      var b = moment(item.expiredDate)
+      item.overduetime = b.diff(a, 'days')
     })
     return items
   }
@@ -65,6 +69,7 @@
       item.expiredTime = (item.expiredTime) ? conv.toDateStr(item.expiredTime, 'yyyy-MM-dd') : ''
       item.givenTime = (item.givenTime) ? conv.toDateStr(item.givenTime, 'yyyy-MM-dd') : ''
       item.limittypes = item.productTypes ? item.productTypes : ''
+      item.useTime = (item.useTime) ? conv.toDateStr(item.useTime, 'yyyy-MM-dd') : ''
     })
     return items
   }
@@ -110,7 +115,7 @@
         ],
         couponpageIndex: 1,
         lcjpageIndex: 1,
-        pageSize: 5,
+        pageSize: 10,
         isLoading: false,
         yhqtotalCount: 0,
         couponList: [],
@@ -196,10 +201,18 @@
       toggleType (type) {
         if (this.type === type) return false
         else this.type = type
+        document.documentElement.scrollTop = 0
+        document.body.scrollTop = 0
+        this.isLoading = false
+        if (type === 'yhq') this.queryCouponList()
+        else this.queryLcjListByStatus()
       },
       tabChange (tabname) {
         if (this.couponstate === tabname) return false
         else {
+          document.documentElement.scrollTop = 0
+          document.body.scrollTop = 0
+          this.isLoading = false
           this.couponpageIndex = 1
           this.couponstate = tabname
           this.queryCouponList()
@@ -208,6 +221,10 @@
       lcjtabChange (tabname) {
         if (this.lcjstate === tabname) return false
         else {
+          document.documentElement.scrollTop = 0
+          document.body.scrollTop = 0
+          this.isLoading = false
+          this.lcjpageIndex = 1
           this.lcjstate = tabname
           this.queryLcjListByStatus()
         }
@@ -242,7 +259,7 @@
       },
       queryLcjListByStatus () {
         var lcjDatas = {
-          pageIndex: 1,
+          pageIndex: this.lcjpageIndex,
           pageSize: this.pageSize,
           state: this.lcjstate
         }
@@ -252,15 +269,20 @@
             this.lcjtotalCount = res.pagination.totalCount
             if (res.pagination.resultList && res.pagination.resultList.length > 0) {
               var lcjList = lcjListOperate(res.pagination.resultList)
-              this.lcjList = lcjList
+              if (this.isLoading) {
+                for (var i = 0; i < lcjList.length; i++) {
+                  this.lcjList.push(lcjList[i])
+                }
+              } else {
+                this.lcjList = lcjList
+              }
             } else {
-              this.lcjtotalCount = 0
-              this.lcjList = []
+              this.lcjList = this.isLoading ? this.lcjList : []
             }
           } else {
-            this.lcjtotalCount = 0
-            this.lcjList = []
+            this.lcjList = this.isLoading ? this.lcjList : []
           }
+          this.isLoading = false
         })
       },
       onLoad () {
@@ -270,6 +292,14 @@
               this.isLoading = true
               this.couponpageIndex++
               this.queryCouponList()
+            } else {
+              return false
+            }
+          } else {
+            if (this.lcjList.length < this.lcjtotalCount) {
+              this.isLoading = true
+              this.lcjpageIndex++
+              this.queryLcjListByStatus()
             } else {
               return false
             }
