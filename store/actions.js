@@ -11,7 +11,10 @@ export default {
         var data = {
           totalAsset: res.totalAsset,
           availBalance: res.availBalance,
-          investingAmount: res.investingAmount
+          investingAmount: res.investingAmount,
+          investmentAmount: res.investmentAmount,
+          investmentProfit: res.investmentProfit,
+          collectProfit: res.collectProfit
         }
         commit('SET_USERINVEST', data)
       }

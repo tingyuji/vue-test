@@ -5,7 +5,7 @@
   "author": "徐静 <xujing@kjtpay.com.cn>",
   "private": true,
   "scripts": {
-    "dev": "nodemon start.js",
+    "dev": "nodemon -w ./server.js -w ./start.js --exec node ./start.js",
     "build": "nuxt build",
     "start": "nuxt build && nuxt start",
     "precommit": "npm run lint",
@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "axios": "^0.16.2",
+    "babel-core": "^6.26.3",
     "body-parser": "^1.18.3",
     "cross-env": "^5.0.1",
     "express": "^4.15.3",
@@ -24,7 +25,6 @@
     "source-map-support": "^0.4.15"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
     "babel-eslint": "^7.2.3",
     "babel-preset-latest-node": "^2.0.2",
     "babel-preset-stage-3": "^6.24.1",

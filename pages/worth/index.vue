@@ -8,7 +8,7 @@
             </div>
             <div class="worth-about">
                 <p class="title">总资产(元)</p>
-                <p class="money">{{isOpen ? formatMoney((userInvet && userInvet.totalAsset) ? userInvet.totalAsset : 0) : '日进斗金'}}<i class="money-desensitization" :class="{open:isOpen}"
+                <p class="money">{{isOpen ? formatMoney((userInvest && userInvest.totalAsset) ? userInvest.totalAsset : 0) : '日进斗金'}}<i class="money-desensitization" :class="{open:isOpen}"
                                                                     @click="toggleOpen"></i></p>
                 <p class="decript">不含快捷通账户余额</p>
             </div>
@@ -39,7 +39,7 @@
 
   export default {
     async fetch ({ store, route }) {
-      if (!store.state.userInfo) {
+      if (!store.state.userInvest.totalAsset) {
         await store.dispatch('getUserInvestInfo')
       }
     },
@@ -55,14 +55,14 @@
           {
             icon: require('~/assets/img/balance.png'),
             title: '可用余额',
-            total: (this.$store.state.userInvet && this.$store.state.userInvet.availBalance) ? this.$store.state.userInvet.availBalance : 0,
+            total: (this.$store.state.userInvest && this.$store.state.userInvest.availBalance) ? this.$store.state.userInvest.availBalance : 0,
             class: 'li_wrap balance'
           },
           {
             icon: require('~/assets/img/investments.png'),
             title: '我的出借',
-            total: (this.$store.state.userInvet && this.$store.state.userInvet.investingAmount) ? this.$store.state.userInvet.investingAmount : 0,
-            href: '/worth',
+            total: (this.$store.state.userInvest && this.$store.state.userInvest.investingAmount) ? this.$store.state.userInvest.investingAmount : 0,
+            href: '/myinvest',
             class: 'li_wrap investments haslink'
           },
           {
@@ -77,7 +77,7 @@
     computed: {
       ...mapState([
         'loginName',
-        'userInvet'
+        'userInvest'
       ])
     },
     methods: {

@@ -1,11 +1,9 @@
 const { Nuxt, Builder } = require('nuxt')
-const bodyParser = require('body-parser')
+// const bodyParser = require('body-parser')
 const app = require('express')()
-const path = require('path')
-const load = require('express-load')
 
 // Body parser，用来封装 req.body
-app.use(bodyParser.json())
+// app.use(bodyParser.json())
 
 // 我们用这些选项初始化 Nuxt.js：
 const isProd = process.env.NODE_ENV === 'production'
@@ -19,15 +17,15 @@ if (!isProd) {
 }
 app.use(nuxt.render)
 
-load('config', {cwd: path.join(__dirname, './')}).into(app)
-for (var environment in app.config) {
-  if (environment === app.get('env')) {
-    global.config = {}
-    for (var key in app.config[environment]) {
-      global.config[key] = app.config[environment][key]
-    }
-  }
-}
+// load('config', {cwd: path.join(__dirname, './')}).into(app)
+// for (var environment in app.config) {
+//   if (environment === app.get('env')) {
+//     global.config = {}
+//     for (var key in app.config[environment]) {
+//       global.config[key] = app.config[environment][key]
+//     }
+//   }
+// }
 
 app.listen(3000)
 console.log('Server is listening on http://localhost:3000')
