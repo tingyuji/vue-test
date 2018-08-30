@@ -236,7 +236,6 @@
           state: this.couponstate
         }
         this.$store.dispatch('queryCouponList', couponDatas).then((res) => {
-          console.log(res.pagination.resultList)
           if (res.responseCode === 0 && res.pagination) {
             this.yhqtotalCount = res.pagination.totalCount
             if (res.pagination.resultList && res.pagination.resultList.length > 0) {

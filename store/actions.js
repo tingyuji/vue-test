@@ -1,4 +1,4 @@
-
+import axios from '~/plugins/axios'
 import Services from './services'
 export default {
   getUserInvestInfo ({ commit, state }) {
@@ -60,5 +60,14 @@ export default {
     }).catch(function (err) {
       console.log(err)
     })
+  },
+
+  async getWeChatCode ({store}) {
+    const redirectUrl = 'http://2v19007a54.iok.la/login'
+    const weixinurl = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2599e1d77e06e184&redirect_uri=' + redirectUrl + '&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'
+    const wechatdata = await axios.get('https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2599e1d77e06e184&redirect_uri=' + redirectUrl + '&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect')
+    console.log('+++wechatdata')
+    console.log(weixinurl)
+    console.log(wechatdata)
   }
 }

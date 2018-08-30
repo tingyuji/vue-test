@@ -68,7 +68,7 @@
           {
             icon: require('~/assets/img/preferential.png'),
             title: '我的优惠',
-            href: '/preferential',
+            href: '/login',
             class: 'li_wrap haslink'
           }
         ]
