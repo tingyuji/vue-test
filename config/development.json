@@ -2,8 +2,8 @@
   "userService": { "url": "http://10.252.12.212:7032"},
   "ossService": { "url": "http://10.252.12.5:7015"},
   "weChat": {
-    "appID": "wx2599e1d77e06e184", // 填写你自己的appID
-    "appSecret": "33a66a8bf56386d607d92a7b941c5d42", // 填写你自己的appSecret
-    "token": "hryWeChat" // 填写你自己的token
+    "appID": "wx2599e1d77e06e184",
+    "appSecret": "33a66a8bf56386d607d92a7b941c5d42",
+    "token": "hryWeChat"
   }
 }

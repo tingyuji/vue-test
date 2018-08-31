@@ -1,6 +1,8 @@
 import axios from 'axios'
 const userService = 'http://10.252.12.212:7032'
 const ossService = 'http://10.252.12.5:7015'
+const memberService = 'http://10.252.12.103:7011'
+
 // hryId:10007952
 export default {
   getUserInvestInfo (datas) {
@@ -29,7 +31,7 @@ export default {
   queryCouponList (datas) {
     return new Promise(function (resolve, reject) {
       console.log(datas)
-      axios.post(ossService + '/couponFacade/queryCouponList', datas).then(function (res) {
+      axios.post(userService + '/couponFacade/queryCouponList', datas).then(function (res) {
         res.status === 200 ? resolve(res.data) : reject('错误:', res.status)
       }).catch(function (err) {
         reject(err)
@@ -58,5 +60,15 @@ export default {
         reject(err)
       })
     })
+  },
+
+  // 登陆
+  login (datas) {
+    return axios.post(memberService + '/customerFacade/login', datas)
+  },
+
+  // 根据token获取用户信息
+  getUserInfoByToken (datas) {
+    return axios.post(userService + '/customerFacade/login', datas)
   }
 }

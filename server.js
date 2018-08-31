@@ -2,9 +2,12 @@ const { Nuxt, Builder } = require('nuxt')
 const bodyParser = require('body-parser')
 const app = require('express')()
 const configDev = require('./config')
+// Require API routes
+const users = require('./api/routes/users')
 
 // Body parser，用来封装 req.body
 app.use(bodyParser.json())
+// Import API Routes
 
 // 我们用这些选项初始化 Nuxt.js：
 const isProd = process.env.NODE_ENV === 'production'
@@ -17,6 +20,7 @@ if (!isProd) {
   builder.build()
 }
 app.use(nuxt.render)
+// app.use('/api', users)
 console.log('configDev')
 console.log(configDev)
 

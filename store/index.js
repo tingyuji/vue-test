@@ -8,7 +8,8 @@ const store = () => new Vuex.Store({
       userId: '10009344'
     },
     loginName: '静静',
-    userInvest: {}
+    userInvest: {},
+    IP: ''
   },
 
   actions,

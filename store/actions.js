@@ -1,6 +1,10 @@
 import axios from '~/plugins/axios'
 import Services from './services'
 export default {
+  nuxtServerInit ({ commit, state }, { req }) {
+    state.IP = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
+  },
+
   getUserInvestInfo ({ commit, state }) {
     var datas = {
       userId: state.user.userId
@@ -62,12 +66,33 @@ export default {
     })
   },
 
-  async getWeChatCode ({store}) {
-    const redirectUrl = 'http://2v19007a54.iok.la/login'
-    const weixinurl = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2599e1d77e06e184&redirect_uri=' + redirectUrl + '&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'
-    const wechatdata = await axios.get('https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2599e1d77e06e184&redirect_uri=' + redirectUrl + '&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect')
-    console.log('+++wechatdata')
-    console.log(weixinurl)
-    console.log(wechatdata)
+  LOGIN ({commit, state}, datas) {
+    datas.verifyCode = 'Ed%8r5'
+    datas.clientIp = state.IP || '127.0.0.0'
+    console.log(datas)
+    console.log(state)
+    var result = {}
+    return Services.login(datas).then(function (res) {
+      console.log('++++login res++++')
+      console.log(res)
+      if (res && res.data && res.data.responseCode === 0) {
+        return Services.getUserInfoByToken(res.data.token).then(function (res) {
+          return res
+        })
+      } else {
+        result = res.data
+        result.success = 0
+        return result
+      }
+    })
   }
+
+  // async getWeChatCode ({store}) {
+  //   const redirectUrl = 'http%3a%2f%2f2v19007a54.iok.la%2flogin'
+  //   const weixinurl = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2599e1d77e06e184&redirect_uri=' + redirectUrl + '&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'
+  //   const wechatdata = await axios.get('https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx2599e1d77e06e184&redirect_uri=' + redirectUrl + '&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect')
+  //   console.log('+++wechatdata')
+  //   console.log(weixinurl)
+  //   console.log(wechatdata)
+  // }
 }
