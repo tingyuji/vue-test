@@ -1,12 +1,15 @@
 const { Nuxt, Builder } = require('nuxt')
 const bodyParser = require('body-parser')
 const app = require('express')()
-const configDev = require('./config')
-// Require API routes
-const users = require('./api/routes/users')
 
 // Body parser，用来封装 req.body
 app.use(bodyParser.json())
+
+// Require API routes
+const apiRoutes = require('./server/routes/api')
+
+app.use('/api', apiRoutes)
+
 // Import API Routes
 
 // 我们用这些选项初始化 Nuxt.js：
@@ -20,9 +23,7 @@ if (!isProd) {
   builder.build()
 }
 app.use(nuxt.render)
-// app.use('/api', users)
-console.log('configDev')
-console.log(configDev)
+
 
 app.listen(3000)
 console.log('Server is listening on http://localhost:3000')

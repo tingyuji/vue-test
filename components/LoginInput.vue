@@ -12,6 +12,8 @@
     </div>
 </template>
 <script>
+    import axios from 'axios'
+    import { Toast } from 'mint-ui';
     export default {
       data () {
         return {
@@ -36,7 +38,15 @@
               unsafePassword: this.password,
               key: 'forlogin'
             }
-            this.$store.dispatch('LOGIN', datas)
+            // this.$store.dispatch('LOGIN', datas)
+            axios.post('/api/login',datas).then((res) => {
+              console.log(res)
+              if (res && res.data && res.data.reponseCode !==0) {
+                Toast(res.data.responseMessage)
+              } else {
+                
+              }
+            })
           } else {
             console.log("can't submit")
             return false

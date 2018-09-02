@@ -13,9 +13,7 @@
   import LoginInput from '../../components/LoginInput.vue'
   export default {
     async asyncData () {
-      let { data } = await axios.get('/api/users/someinport')
-      console.log(data)
-      return { users: data }
+
     },
     head () {
       return {

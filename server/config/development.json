@@ -1,4 +1,5 @@
 {
+	"memberService": { "url": "http://10.252.12.103:7011"},
   "userService": { "url": "http://10.252.12.212:7032"},
   "ossService": { "url": "http://10.252.12.5:7015"},
   "weChat": {

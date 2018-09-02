@@ -21,12 +21,12 @@ module.exports = {
   /*
   ** Global CSS
   */
-  css: ['~/static/css/main.css'],
+  css: ['~/static/css/main.css','mint-ui/lib/style.css'],
   /*
   ** Add axios globally
   */
   build: {
-    vendor: ['axios'],
+    vendor: ['axios', 'mint-ui'],
     /*
     ** Run ESLINT on save
     */
@@ -41,6 +41,9 @@ module.exports = {
       }
     }
   },
+  plugins: [
+    { src: '~plugins/mint-ui.js', ssr: true }
+  ],
   serverMiddleware: [
     // API middleware
     '~/api/index.js'

@@ -19,11 +19,13 @@
     "express": "^4.15.3",
     "express-load": "^1.1.16",
     "lodash": "^4.17.10",
+    "mint-ui": "^2.2.13",
     "moment": "^2.22.2",
     "node-sass": "^4.9.3",
     "nuxt": "^1.4.2",
     "sass-loader": "^7.1.0",
-    "source-map-support": "^0.4.15"
+    "source-map-support": "^0.4.15",
+    "superagent": "^3.8.3"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
