@@ -3,7 +3,7 @@
         <div class="worth-container">
             <div class="worth-navbar">
                 <div class="back-icon"></div>
-                <span>{{realNameHide(loginName)}}</span>
+                <span>{{realNameHide($store.state.userInfo.realName)}}</span>
                 <div class="uer-loginout">退出</div>
             </div>
             <div class="worth-about">
@@ -38,9 +38,21 @@
   import formatMoney from '~/helper/formatMoney.js'
 
   export default {
+    middleware: 'auth',
     async fetch ({ store, route }) {
+      console.log('worth page')
+      console.log(store.state.userInfo)
+      if (!store.state.userInfo.realName) {
+        console.log('getuserloginname')
+        await store.dispatch('getPersonalRealName')
+        // console.log(realName)
+        // store.commit('SET_REALNAME', realName)
+      }
+
       if (!store.state.userInvest.totalAsset) {
         await store.dispatch('getUserInvestInfo')
+        // console.log(investInfo)
+        // store.commit('SET_USERINVEST', investInfo)
       }
     },
     head () {

@@ -4,12 +4,12 @@ import mutations from './mutations'
 
 const store = () => new Vuex.Store({
   state: {
-    user: {
-      userId: '10009344'
+    userInfo: {
+      userId: '',
+      realName: ''
     },
-    loginName: '静静',
     userInvest: {},
-    IP: ''
+    openId: ''
   },
 
   actions,

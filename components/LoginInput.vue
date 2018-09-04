@@ -13,7 +13,7 @@
 </template>
 <script>
     import axios from 'axios'
-    import { Toast } from 'mint-ui';
+    import { Toast, Indicator } from 'mint-ui'
     export default {
       data () {
         return {
@@ -33,18 +33,36 @@
         },
         submitLogin () {
           if (this.cansubmit) {
+            Indicator.open()
             var datas = {
               loginName: this.loginname,
               unsafePassword: this.password,
               key: 'forlogin'
             }
             // this.$store.dispatch('LOGIN', datas)
-            axios.post('/api/login',datas).then((res) => {
-              console.log(res)
-              if (res && res.data && res.data.reponseCode !==0) {
-                Toast(res.data.responseMessage)
+            axios.post('/api/login', datas).then((res) => {
+              console.log(res.data)
+              if (res && res.data && res.data.responseCode !== 0) {
+                Indicator.close()
+                Toast(res.data.responseMessage || '异常状态，请稍后再试！')
               } else {
-                
+                this.$store.dispatch('getUserIdAndBindOpenid', res.data.token).then((resp) => {
+                  Indicator.close()
+                  console.log(resp)
+                  if (resp && resp.responseCode === 0) {
+                    if (this.$route.query && this.$route.query.returnUrl) {
+                      this.$router.push({
+                        path: this.$route.query.returnUrl
+                      })
+                    } else {
+                      this.$router.push({
+                        path: '/worth'
+                      })
+                    }
+                  } else {
+                    Toast(resp.responseMessage || '获取用户信息异常')
+                  }
+                })
               }
             })
           } else {

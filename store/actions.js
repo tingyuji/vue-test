@@ -1,18 +1,111 @@
-import axios from '~/plugins/axios'
 import Services from './services'
 export default {
-  nuxtServerInit ({ commit, state }, { req }) {
-    state.IP = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
+  async nuxtServerInit ({ commit, state }, { req, res }) {
+    if (req.query.code) {
+      // const wechatUrl = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx2599e1d77e06e184&secret=33a66a8bf56386d607d92a7b941c5d42&code=' + req.query.code + '&grant_type=authorization_code'
+      // const wechatInfo = await axios.get(wechatUrl)
+      const wechatInfo = await Services.getWeChatOpenid(req.query.code)
+      console.log('wechatInfo')
+      console.log(wechatInfo.data)
+      if (wechatInfo && wechatInfo.data && wechatInfo.data.openid) {
+        var datas = {openId: wechatInfo.data.openid}
+        const getUseridByopenid = await Services.getUserIdByOpenId(datas)
+        console.log('getUseridByopenid.body')
+        console.log(getUseridByopenid.body)
+        if (getUseridByopenid && getUseridByopenid.body && getUseridByopenid.body.responseCode === 0) {
+          commit('SET_USERID', getUseridByopenid.body.userId)
+        } else if (getUseridByopenid && getUseridByopenid.body && getUseridByopenid.body.responseCode === 7999) {
+          commit('SET_OPENID', wechatInfo.data.openid)
+        } else {
+          console.log(getUseridByopenid.body.responseMessage)
+        }
+      } else {
+        console.log(wechatInfo.data || wechatInfo)
+      }
+    } else if (req.headers.cookie) {
+      var cookie = req.headers.cookie
+      var cookieObj = {}
+      var cookieArr = []
+      var key = ''
+      var value = ''
+      cookie = cookie.split(';')
+      for (let i = 0; i < cookie.length; i++) {
+        cookieArr = cookie[i].trim().split('=')
+        key = cookieArr[0]
+        value = cookieArr[1]
+        cookieObj[key] = value
+      }
+      console.log(cookieObj)
+      if (cookieObj['com.vfsso.cas.token']) {
+        var token = cookieObj['com.vfsso.cas.token']
+        var userInfo = await Services.getUserIdBytoken(token)
+        console.log(userInfo.body)
+        if (userInfo && userInfo.body && userInfo.body.userDto && userInfo.body.userDto.userId) {
+          commit('SET_USERID', userInfo.body.userDto.userId)
+          console.log(state.userInfo)
+        }
+      }
+    }
+  },
+
+  async getUserIdAndBindOpenid ({ commit, state }, token) {
+    var result = {}
+    var getUserInfo = await Services.getUserIdBytoken(token)
+    console.log(getUserInfo.body)
+    if (getUserInfo && getUserInfo.body && getUserInfo.body.userDto && getUserInfo.body.userDto.userId) {
+      commit('SET_USERID', getUserInfo.body.userDto.userId)
+      if (state.openId) {
+        var datas = {
+          userId: getUserInfo.body.userDto.userId,
+          openId: state.openId
+        }
+        var useridBindOpenid = await Services.getUserIdAndBindOpenid(datas)
+        console.log('useridBindOpenid')
+        console.log(useridBindOpenid.body)
+        if (useridBindOpenid && useridBindOpenid.body && useridBindOpenid.body.responseCode === 0) {
+          result = {
+            responseCode: 0,
+            responseMessage: '绑定成功'
+          }
+        } else {
+          result = {
+            responseCode: 0,
+            responseMessage: '获取用户信息成功'
+          }
+        }
+      } else {
+        result = {
+          responseCode: 0,
+          responseMessage: '获取用户信息成功'
+        }
+      }
+    } else {
+      result = getUserInfo.body
+    }
+    return result
+  },
+
+  getPersonalRealName ({ commit, state }) {
+    var datas = { userId: state.userInfo.userId }
+    var realName = ''
+    return Services.getPersonalRealName(datas).then(function (getPersonalRealName) {
+      if (getPersonalRealName && getPersonalRealName.body && getPersonalRealName.body.personalRealNameDto && getPersonalRealName.body.personalRealNameDto.realName) {
+        realName = getPersonalRealName.body.personalRealNameDto.realName
+      }
+      commit('SET_REALNAME', realName)
+      return null
+    })
   },
 
   getUserInvestInfo ({ commit, state }) {
     var datas = {
-      userId: state.user.userId
+      userId: state.userInfo.userId
     }
     console.log(datas)
+    var investInfo = {}
     return Services.getUserInvestInfo(datas).then(function (res) {
       if (res) {
-        var data = {
+        investInfo = {
           totalAsset: res.totalAsset,
           availBalance: res.availBalance,
           investingAmount: res.investingAmount,
@@ -20,9 +113,9 @@ export default {
           investmentProfit: res.investmentProfit,
           collectProfit: res.collectProfit
         }
-        commit('SET_USERINVEST', data)
       }
-      return res
+      commit('SET_USERINVEST', investInfo)
+      return investInfo
     }).catch(function (err) {
       console.log(err)
     })

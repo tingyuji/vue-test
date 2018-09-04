@@ -9,11 +9,14 @@
     </div>
 </template>
 <script>
-  import axios from '~/plugins/axios'
   import LoginInput from '../../components/LoginInput.vue'
   export default {
-    async asyncData () {
-
+    async asyncData ({ store, redirect }) {
+      console.log(store.state.userInfo)
+      console.log(store.state.openid)
+      if (store.state.userInfo && store.state.userInfo.userId) {
+        redirect('/worth')
+      }
     },
     head () {
       return {

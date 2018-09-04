@@ -43,9 +43,9 @@ module.exports = {
   },
   plugins: [
     { src: '~plugins/mint-ui.js', ssr: true }
-  ],
-  serverMiddleware: [
-    // API middleware
-    '~/api/index.js'
   ]
+  // serverMiddleware: [
+  //   // API middleware
+  //   '~/api/index.js'
+  // ]
 }
